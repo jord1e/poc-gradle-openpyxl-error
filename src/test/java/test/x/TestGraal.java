@@ -1,14 +1,19 @@
 package test.x;
 
 import org.graalvm.python.embedding.utils.GraalPyResources;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TestGraal {
 
     @Test
+    @Order(1)
     void works() {
         try (var ctx = GraalPyResources.createContext()) {
             ctx.eval("python", """
@@ -35,12 +40,14 @@ public class TestGraal {
     }
 
     @Test
+    @Order(2)
     void fails() {
         try (var ctx = GraalPyResources.createContext()) {
             ctx.eval("python", """
                     import openpyxl
                     import io
-                    from openpyxl.workbook import Workbook # This line fails with the error
+                    # This line fails with the error
+                    from openpyxl.workbook import Workbook
                     
                     # Typing here makes requires the import above, causing the HostException
                     wb: Workbook = openpyxl.Workbook()

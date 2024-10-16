@@ -19,6 +19,7 @@ repositories {
 dependencies {
     implementation("org.graalvm.polyglot:polyglot:24.1.1")
     implementation("org.graalvm.polyglot:python-community:24.1.1")
+    implementation("org.graalvm.polyglot:llvm-community:24.1.1")
 
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
