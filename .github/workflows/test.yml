@@ -35,3 +35,11 @@ jobs:
           path: build/reports/
           retention-days: 5
           if-no-files-found: ignore
+      - name: "Excel file"
+        uses: actions/upload-artifact@v4
+        if: ${{ success() }}
+        with:
+          name: excel-file
+          path: test.xlsx
+          retention-days: 5
+          if-no-files-found: ignore
