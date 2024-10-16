@@ -1,5 +1,6 @@
 package test.x;
 
+import org.graalvm.polyglot.Source;
 import org.graalvm.python.embedding.utils.GraalPyResources;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -12,11 +13,8 @@ import java.nio.file.Path;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TestGraal {
 
-    @Test
-    @Order(1)
-    void works() {
-        try (var ctx = GraalPyResources.createContext()) {
-            ctx.eval("python", """
+    private static final Source PY_SOURCE_WORKS = Source
+            .create("python", """
                     import openpyxl
                     import io
                     
@@ -27,6 +25,12 @@ public class TestGraal {
                     wb.save(out_bytes)
                     output = out_bytes.getvalue()
                     """);
+
+    @Test
+    @Order(1)
+    void works() {
+        try (var ctx = GraalPyResources.createContext()) {
+            ctx.eval(PY_SOURCE_WORKS);
 
             int[] excelOutput = ctx.getBindings("python").getMember("output").as(int[].class);
             byte[] excelOutputSigned = new byte[excelOutput.length];
@@ -41,6 +45,23 @@ public class TestGraal {
 
     @Test
     @Order(2)
+    void works2() {
+        try (var ctx = GraalPyResources.createContext()) {
+            ctx.eval(PY_SOURCE_WORKS);
+
+            int[] excelOutput = ctx.getBindings("python").getMember("output").as(int[].class);
+            byte[] excelOutputSigned = new byte[excelOutput.length];
+            for (int i = 0; i < excelOutput.length; i++) {
+                excelOutputSigned[i] = (byte) excelOutput[i];
+            }
+            Files.write(Path.of("test-works2.xlsx"), excelOutputSigned);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    @Order(3)
     void fails() {
         try (var ctx = GraalPyResources.createContext()) {
             ctx.eval("python", """
